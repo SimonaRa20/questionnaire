@@ -16,6 +16,7 @@ export default function App() {
   const [showScore, setShowScore] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
+  const [mixedAnswers, setMixedAnswers] = useState<string[]>([]);
 
   useEffect(() => {
     fetch('https://opentdb.com/api.php?amount=10')
@@ -34,8 +35,20 @@ export default function App() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
-  const handleAnswerOptionClick = (isCorrect: boolean) => {
-    if (isCorrect) {
+  useEffect(() => {
+    if (questions.length > 0) {
+      mixAnswers();
+    }
+  }, [currentQuestion, questions]);
+
+  const mixAnswers = () => {
+    const allAnswers = [...questions[currentQuestion]?.incorrect_answers, questions[currentQuestion]?.correct_answer];
+    const shuffledAnswers = shuffleAnswers(allAnswers);
+    setMixedAnswers(shuffledAnswers);
+  };
+
+  const handleAnswerOptionClick = (selectedAnswer: string) => {
+    if (selectedAnswer === questions[currentQuestion]?.correct_answer) {
       setScore(score + 1);
     }
 
@@ -48,18 +61,28 @@ export default function App() {
     }
   };
 
+  const shuffleAnswers = (answers: string[]): string[] => {
+    const shuffledAnswers = [...answers];
+    for (let i = shuffledAnswers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
+    }
+    return shuffledAnswers;
+  };
+
   const resetGame = () => {
     setScore(0);
     setCurrentQuestion(0);
     setShowScore(false);
     setGameOver(false);
+    mixAnswers();
   };
 
   return (
     <Container sx={{ margin: 4, display: 'flex', justifyContent: 'center' }}>
       <Box
         sx={{
-          width: '500px',
+          width: '600px',
           height: '300px',
           border: 1,
           display: 'flex',
@@ -85,26 +108,21 @@ export default function App() {
             </Box>
           ) : (
             <Box>
-              <Box textAlign="center" mb={4}>
+              <Box textAlign="center" mb={7}>
                 <div className='question-text'>{questions[currentQuestion]?.question}</div>
               </Box>
               <Box textAlign="center" mb={4}>
                 <Grid container spacing={2} justifyContent="center">
-                  {questions[currentQuestion]?.incorrect_answers.map((answerOption: string, index: number) => (
+                  {mixedAnswers.map((answerOption: string, index: number) => (
                     <Grid key={index} item>
-                      <Button variant="outlined" onClick={() => handleAnswerOptionClick(false)}>
+                      <Button variant="outlined" onClick={() => handleAnswerOptionClick(answerOption)}>
                         {answerOption}
                       </Button>
                     </Grid>
                   ))}
-                  <Grid item>
-                    <Button variant="outlined" onClick={() => handleAnswerOptionClick(true)}>
-                      {questions[currentQuestion]?.correct_answer}
-                    </Button>
-                  </Grid>
                 </Grid>
               </Box>
-              <Box textAlign="center" mb={4}>
+              <Box textAlign="right" mb={1}>
                 <div className='question-count'>
                   {currentQuestion + 1}/{questions.length}
                 </div>
