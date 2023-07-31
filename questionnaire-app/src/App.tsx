@@ -14,6 +14,9 @@ export default function App() {
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [showScore, setShowScore] = useState<boolean>(false);
+  const [score, setScore] = useState<number>(0);
+  const [gameOver, setGameOver] = useState<boolean>(false);
 
   useEffect(() => {
     fetch('https://opentdb.com/api.php?amount=10')
@@ -32,6 +35,20 @@ export default function App() {
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
+  const handleAnswerOptionClick = (isCorrect: boolean) => {
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+    } else {
+      setShowScore(true);
+      setGameOver(true);
+    }
+  };
+
   return (
     <Container sx={{ margin: 4, display: 'flex', justifyContent: 'center' }}>
       <Box sx={{
@@ -42,7 +59,17 @@ export default function App() {
         alignItems: 'center',
       }}>
         <Box sx={{ margin: 4 }}>
-            <Box>
+          {showScore ? (
+            <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+              <Box mb={4}>
+                <div className='score-section'>
+                  Congratulations, you answered {score}/{questions.length} questions correctly.
+                </div>
+              </Box>
+            </Box>
+          ) : (
+            <Box
+            >
               <Box textAlign="center" mb={4}>
                 <div className='question-text'>{questions[currentQuestion]?.question}</div>
               </Box>
@@ -50,7 +77,7 @@ export default function App() {
                 <Grid container spacing={2} justifyContent="center">
                   {questions[currentQuestion]?.incorrect_answers.map((incorrectAnswer: string, index: number) => (
                     <Grid key={index} item>
-                      <Button variant="outlined">
+                      <Button variant="outlined" onClick={() => handleAnswerOptionClick(false)}>
                         {incorrectAnswer}
                       </Button>
                     </Grid>
@@ -63,6 +90,7 @@ export default function App() {
                 </div>
               </Box>
             </Box>
+          )}
         </Box>
       </Box>
     </Container>
