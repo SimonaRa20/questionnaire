@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Container, Box, Grid, Button } from '@mui/material';
 
 export default function App() {
-
   interface Question {
-    category: string,
-    type: string,
-    difficulty: string,
-    question: string,
-    correct_answer: string,
-    incorrect_answers: string[]
+    category: string;
+    type: string;
+    difficulty: string;
+    question: string;
+    correct_answer: string;
+    incorrect_answers: string[];
   }
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -49,15 +48,25 @@ export default function App() {
     }
   };
 
+  const resetGame = () => {
+    setScore(0);
+    setCurrentQuestion(0);
+    setShowScore(false);
+    setGameOver(false);
+  };
+
   return (
     <Container sx={{ margin: 4, display: 'flex', justifyContent: 'center' }}>
-      <Box sx={{
-        width: "500px", height: "300px",
-        border: 1,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
+      <Box
+        sx={{
+          width: '500px',
+          height: '300px',
+          border: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <Box sx={{ margin: 4 }}>
           {showScore ? (
             <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
@@ -66,27 +75,38 @@ export default function App() {
                   Congratulations, you answered {score}/{questions.length} questions correctly.
                 </div>
               </Box>
+              <Box>
+                {gameOver && (
+                  <Button onClick={resetGame} variant="outlined">
+                    Play 1 more time
+                  </Button>
+                )}
+              </Box>
             </Box>
           ) : (
-            <Box
-            >
+            <Box>
               <Box textAlign="center" mb={4}>
                 <div className='question-text'>{questions[currentQuestion]?.question}</div>
               </Box>
               <Box textAlign="center" mb={4}>
                 <Grid container spacing={2} justifyContent="center">
-                  {questions[currentQuestion]?.incorrect_answers.map((incorrectAnswer: string, index: number) => (
+                  {questions[currentQuestion]?.incorrect_answers.map((answerOption: string, index: number) => (
                     <Grid key={index} item>
                       <Button variant="outlined" onClick={() => handleAnswerOptionClick(false)}>
-                        {incorrectAnswer}
+                        {answerOption}
                       </Button>
                     </Grid>
                   ))}
+                  <Grid item>
+                    <Button variant="outlined" onClick={() => handleAnswerOptionClick(true)}>
+                      {questions[currentQuestion]?.correct_answer}
+                    </Button>
+                  </Grid>
                 </Grid>
               </Box>
               <Box textAlign="center" mb={4}>
                 <div className='question-count'>
-                  Question {currentQuestion + 1}/{questions.length}
+                  {currentQuestion + 1}/{questions.length}
                 </div>
               </Box>
             </Box>
