@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Grid, Button } from '@mui/material';
+import { Container, Box, Grid, Button, CircularProgress } from '@mui/material';
 
 export default function App() {
   interface Question {
@@ -11,6 +11,7 @@ export default function App() {
     incorrect_answers: string[];
   }
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [showScore, setShowScore] = useState<boolean>(false);
@@ -31,8 +32,12 @@ export default function App() {
           incorrect_answers: result.incorrect_answers,
         }));
         setQuestions(formattedQuestions);
+        setLoading(false);
       })
-      .catch((error) => console.error('Error fetching data:', error));
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+        setLoading(false); 
+      });
   }, []);
 
   useEffect(() => {
@@ -97,7 +102,9 @@ export default function App() {
         }}
       >
         <Box sx={{ margin: 4 }}>
-          {showScore ? (
+          { loading? (
+          <CircularProgress sx={{color: 'black'}}/>
+          ) : showScore ? (
             <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center">
               <Box mb={4}>
                 <div className='score-section'>
@@ -121,7 +128,7 @@ export default function App() {
           ) : (
             <Box>
               <Box textAlign="center" mb={7}>
-                <div className='question-text'>{questions[currentQuestion]?.question}</div>
+              <div className='question-text' dangerouslySetInnerHTML={{ __html: questions[currentQuestion]?.question }} />
               </Box>
               <Box textAlign="center" mb={4}>
                 <Grid container spacing={2} justifyContent="center">
@@ -132,9 +139,9 @@ export default function App() {
                         borderBlockColor: 'black',
                         borderBlockStyle: 'solid'
                       }}
-                        onClick={() => handleAnswerOptionClick(answerOption)}
+                        onClick={() => handleAnswerOptionClick(answerOption)} 
                       >
-                        {answerOption}
+                        <div dangerouslySetInnerHTML={{ __html: answerOption }} />
                       </Button>
                     </Grid>
                   ))}
