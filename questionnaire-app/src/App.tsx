@@ -79,7 +79,12 @@ export default function App() {
   };
 
   return (
-    <Container sx={{ margin: 4, display: 'flex', justifyContent: 'center' }}>
+    <Container sx={{
+      margin: 4,
+      display: 'flex',
+      justifyContent: 'center'
+    }}
+    >
       <Box
         sx={{
           width: '600px',
@@ -88,6 +93,7 @@ export default function App() {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          boxShadow: 1
         }}
       >
         <Box sx={{ margin: 4 }}>
@@ -100,7 +106,13 @@ export default function App() {
               </Box>
               <Box>
                 {gameOver && (
-                  <Button onClick={resetGame} variant="outlined">
+                  <Button sx={{
+                    color: 'black',
+                    borderBlockColor: 'black',
+                    borderBlockStyle: 'solid'
+                  }}
+                    onClick={resetGame}
+                    variant="outlined">
                     Play 1 more time
                   </Button>
                 )}
@@ -115,7 +127,13 @@ export default function App() {
                 <Grid container spacing={2} justifyContent="center">
                   {mixedAnswers.map((answerOption: string, index: number) => (
                     <Grid key={index} item>
-                      <Button variant="outlined" onClick={() => handleAnswerOptionClick(answerOption)}>
+                      <Button variant="outlined" sx={{
+                        color: 'black',
+                        borderBlockColor: 'black',
+                        borderBlockStyle: 'solid'
+                      }}
+                        onClick={() => handleAnswerOptionClick(answerOption)}
+                      >
                         {answerOption}
                       </Button>
                     </Grid>
